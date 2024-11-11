@@ -6,13 +6,16 @@
 //
 
 import UIKit
+import SwiftyGif
+
 
 class ViewController: UIViewController {
   
     @IBOutlet weak var lblPlayerX: UILabel!
     @IBOutlet weak var lblPlayerO: UILabel!
     @IBOutlet weak var btnPlayAgain: UIButton!
-    
+    @IBOutlet weak var imgAnimation: UIImageView!
+    @IBOutlet weak var lblStatus: UILabel!
     
     var activePlayer = 1  // x is active
     var gameState : [Int] = [0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -34,11 +37,14 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         btnPlayAgain.isHidden = true
+        btnPlayAgain.layer.cornerRadius = 5
+        btnPlayAgain.layer.masksToBounds = true
     }
     
     
     @IBAction func actionBtnClicked(_ sender: AnyObject) {
         guard let index = sender.tag else { return }
+        
         
         if (gameState[index - 1] == 0) && gameIsActive {
             gameState[index - 1] = activePlayer
@@ -46,11 +52,9 @@ class ViewController: UIViewController {
             if (activePlayer == 1){
                 print("BUtton is getting tapped,", index)
                 sender.setImage(UIImage(named: "tictactoeX"), for: UIControl.State())
-                sender.imageView!.contentMode = .scaleAspectFit
                 activePlayer = 2 //2nd player is active now which is, 0
             }else {
                 sender.setImage(UIImage(named: "tictactoeO"), for: UIControl.State())
-                sender.imageView!.contentMode = .scaleAspectFit
                 activePlayer = 1 // 1st player is active now which is X
             }
             
@@ -61,17 +65,41 @@ class ViewController: UIViewController {
                 
                 if gameState[combination[0]] == 1 {
                     totalWinsForX += 1
-                    lblPlayerX.text = String(totalWinsForX)
-                 print("X won")
+                    lblPlayerX.text = "Player X win's \(totalWinsForX) times!"
+                    lblStatus.text = "Player X Won!😅"
+                    startAnimation()
+                    disableButtons()
+                    
                 }else {
                     totalWinsForO += 1
-                    lblPlayerX.text = String(totalWinsForO)
-                    print("O won")
+                    lblPlayerO.text = "Player O win's \(totalWinsForO) times!"
+                    lblStatus.text = "Player O Won!😅"
+                    startAnimation()
+                    disableButtons()
+                    
                 }
+                
                 btnPlayAgain.isHidden = false
+                
             }
         }
         
+        gameIsActive = false
+        
+        for i in gameState {
+            if i == 0 {
+                gameIsActive = true
+                break
+            }
+        }
+        
+        if gameIsActive == false {
+            lblStatus.text = "Match is DRAW😅"
+            disableButtons()
+            lblStatus.isHidden = false
+            btnPlayAgain.isHidden = false
+        }
+ 
     }
   
     
@@ -80,6 +108,7 @@ class ViewController: UIViewController {
         gameState = [0, 0, 0, 0, 0, 0, 0, 0, 0]
         gameIsActive = true
         activePlayer = 1
+        lblStatus.text = ""
         
         btnPlayAgain.isHidden = true
         
@@ -87,7 +116,6 @@ class ViewController: UIViewController {
             let button = view.viewWithTag(i) as! UIButton
             button.setImage(UIImage(named: ""), for: UIControl.State())
         }
-        
     }
     
     
@@ -106,5 +134,16 @@ class ViewController: UIViewController {
     }
     
     
+    func startAnimation(){
+       
+        do {
+            let gif = try! UIImage(gifName: "success.gif", levelOfIntegrity:0.5 )
+            self.imgAnimation.setGifImage(gif, loopCount: 1)
+            
+        }catch {
+            print("DEBUG: code went into Catch block!")
+        }
+    }
+     
 }
 
